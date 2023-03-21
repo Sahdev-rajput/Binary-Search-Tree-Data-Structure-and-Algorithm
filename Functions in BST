@@ -1,0 +1,114 @@
+#include <iostream>
+#include <stack>
+using namespace std;
+struct Node
+{
+	struct Node *lchild;
+	int data;
+	struct Node *rchild;
+}*root=NULL;
+struct Node* RInsert(struct Node* p, int key)
+{
+	struct Node* t=new struct Node;
+	if (p == NULL)
+	{
+		t->data = key;
+		t->lchild =t->rchild = NULL;
+		p = t;
+		root = p;
+	}
+	else if (p->data < key)
+	{
+		p->rchild = RInsert(p->rchild, key);
+	}
+	else if (p->data > key)
+	{
+		p->lchild = RInsert(p->lchild, key);
+	}
+	return p;
+}
+struct Node* RDisplay(struct Node* p)
+{
+	if (p != NULL)
+	{
+		RDisplay(p->lchild);
+		cout << p->data << " ";
+		RDisplay(p->rchild);
+	}
+	return NULL;
+}
+void IInsert(struct Node* p, int key)
+{
+	struct Node* q = p;
+	struct Node* t=new struct Node;
+	struct Node* r;
+	r = NULL;
+	while (q != NULL)
+	{
+		r = q;
+		if (q->data == key)
+		{
+			return;
+		}
+		else if (q->data < key)
+		{
+			q = q->rchild;
+		}
+		else
+		{
+			q = q->lchild;
+		}
+	}
+	t->data = key;
+	t->lchild = t->rchild = NULL;
+	if (r == NULL)
+	{
+		r = t;
+		root = r;
+	}
+	else if (r->data > t->data)
+	{
+		r->lchild = t;
+	}
+	else
+	{
+		r->rchild = t;
+	}
+}
+void IDisplay(struct Node* p)
+{
+	stack<Node*> st;
+	while (p || !st.empty())
+	{
+		if (p != NULL)
+		{
+			st.push(p);
+			p = p->lchild;
+		}
+		else
+		{
+			p = st.top();
+			cout << p->data << " ";
+			st.pop();
+			p = p->rchild;
+		}
+	}
+}
+int main()
+{
+	//IInsert(root, 30);
+	root= RInsert(root, 30);
+	root = RInsert(root, 10);
+	root = RInsert(root, 20);
+	root = RInsert(root, 5);
+	//root = RInsert(root, 50);
+	//root = RInsert(root, 25);
+	struct Node* t = new struct Node;
+	t->data = 10;
+	t->lchild = t->rchild = NULL;
+	//IInsert(root, 10);
+	//IInsert(root, 25);
+	//IInsert(root, 50);
+	//IInsert(root, 5);
+	RDisplay(root);
+}
