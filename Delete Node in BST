@@ -1,0 +1,286 @@
+#include <iostream>
+#include <stack>
+using namespace std;
+struct Node
+{
+	struct Node* lchild;
+	int data;
+	struct Node* rchild;
+}*root = NULL;
+struct Node* RInsert(struct Node* p, int key)
+{
+	struct Node* t = new struct Node;
+	if (p == NULL)
+	{
+		t->data = key;
+		t->lchild = t->rchild = NULL;
+		p = t;
+		root = p;
+	}
+	else if (p->data < key)
+	{
+		p->rchild = RInsert(p->rchild, key);
+	}
+	else if (p->data > key)
+	{
+		p->lchild = RInsert(p->lchild, key);
+	}
+	return p;
+}
+struct Node* RDisplay(struct Node* p)
+{
+	if (p != NULL)
+	{
+		RDisplay(p->lchild);
+		cout << p->data << " ";
+		RDisplay(p->rchild);
+	}
+	return NULL;
+}
+void IInsert(struct Node* p, int key)
+{
+	struct Node* q = p;
+	struct Node* t = new struct Node;
+	struct Node* r;
+	r = NULL;
+	while (q != NULL)
+	{
+		r = q;
+		if (q->data == key)
+		{
+			return;
+		}
+		else if (q->data < key)
+		{
+			q = q->rchild;
+		}
+		else
+		{
+			q = q->lchild;
+		}
+	}
+	t->data = key;
+	t->lchild = t->rchild = NULL;
+	if (r == NULL)
+	{
+		r = t;
+		root = r;
+	}
+	else if (r->data > t->data)
+	{
+		r->lchild = t;
+	}
+	else
+	{
+		r->rchild = t;
+	}
+}
+void IDisplay(struct Node* p)
+{
+	stack<Node*> st;
+	while (p || !st.empty())
+	{
+		if (p != NULL)
+		{
+			st.push(p);
+			p = p->lchild;
+		}
+		else
+		{
+			p = st.top();
+			cout << p->data << " ";
+			st.pop();
+			p = p->rchild;
+		}
+	}
+}
+void PretoBST(int nums[],int n)
+{
+	root = new struct Node;
+	int i = 0;
+	struct Node* p, * t;
+	stack<struct Node*> st;
+	root->data = nums[i++];
+	root->lchild = root->rchild = NULL;
+	p = root;
+	while (i < n)
+	{
+		if (p->data > nums[i])
+		{
+			t = new struct Node;
+			t->data = nums[i++];
+			t->lchild = t->rchild = NULL;
+			p->lchild = t;
+			st.push(p);
+			p = t;
+		}
+		else
+		{
+			if (!st.empty() && nums[i] < st.top()->data)
+			{
+				t = new struct Node;
+				t->data = nums[i++];
+				t->lchild = t->rchild = NULL;
+				p->rchild = t;
+				p = t;
+			}
+			else if (st.empty())
+			{
+				t = new struct Node;
+				t->data = nums[i++];
+				t->lchild = t->rchild = NULL;
+				p->rchild = t;
+				p = t;
+			}
+			else
+			{
+				p = st.top();
+				st.pop();
+			}
+		}
+	}
+}
+void PosttoBST(int nums[], int n)
+{
+	root = new struct Node;
+	int i = n-1;
+	struct Node* p, * t;
+	stack<struct Node*> st;
+	root->data = nums[i--];
+	root->lchild = root->rchild = NULL;
+	p = root;
+	while (i >=0)
+	{
+		if (p->data < nums[i])
+		{
+			t = new struct Node;
+			t->data = nums[i--];
+			t->lchild = t->rchild = NULL;
+			p->rchild = t;
+			st.push(p);
+			p = t;
+		}
+		else
+		{
+			if (!st.empty() && nums[i] < st.top()->data)
+			{
+				p = st.top();
+				st.pop();
+			}
+			/*else if (st.empty())
+			{
+				t = new struct Node;
+				t->data = nums[i--];
+				t->lchild = t->rchild = NULL;
+				p->rchild = t;
+				p = t;
+			}*/
+			else
+			{
+				t = new struct Node;
+				t->data = nums[i--];
+				t->lchild = t->rchild = NULL;
+				p->lchild = t;
+				p = t;
+			}
+		}
+	}
+}
+int Height(struct Node* p)
+{
+	int x, y;
+	if (p)
+	{
+		x = Height(p->lchild);
+		y = Height(p->rchild);
+		if (x > y)
+		{
+			return x + 1;
+		}
+		else
+		{
+			return y + 1;
+		}
+	}
+	return 0;
+}
+struct Node* Inpreced(struct Node *p)
+{
+	if (p->lchild != NULL || p->rchild != NULL)
+	{
+		p = p->rchild;
+	}
+	return p;
+}
+struct Node* Inposced(struct Node* p)
+{
+	if (p->lchild != NULL || p->rchild != NULL)
+	{
+		p = p->lchild;
+	}
+	return p;
+}
+struct Node* Delete(struct Node* p, int key)
+{
+	if (p == NULL)
+	{
+		return p;
+	}
+	if (p->lchild == NULL && p->rchild == NULL)
+	{
+		if (p == root)
+		{
+			root = NULL;
+		}
+		delete(p);
+		return NULL;
+	}
+	if (key < p->data)
+	{
+		p->lchild = Delete(p->lchild, key);
+	}
+	else if (key > p->data)
+	{
+		p->rchild = Delete(p->rchild, key);
+	}
+	else
+	{
+		if (Height(p->lchild) < Height(p->rchild))
+		{
+			struct Node* q;
+			q = Inpreced(p->lchild);
+			p->data = q->data;
+			p->lchild = Delete(p->lchild, key);
+		}
+		else
+		{
+			struct Node* q;
+			q = Inposced(p->rchild);
+			p->data = q->data;
+			p->rchild = Delete(p->rchild, key);
+		}
+	}
+	return p;
+}
+int main()
+{
+	//IInsert(root, 30);
+	root = RInsert(root, 30);
+	root = RInsert(root, 10);
+	root = RInsert(root, 20);
+	root = RInsert(root, 5);
+	root = RInsert(root, 50);
+	root = RInsert(root, 25);
+	//struct Node* t = new struct Node;
+	//t->data = 10;
+	//t->lchild = t->rchild = NULL;
+	//IInsert(root, 10);
+	//IInsert(root, 25);
+	//IInsert(root, 50);
+	//IInsert(root, 5);
+	//int A[8] = {2,7,18,15,25,62,35,21 };
+	//PosttoBST(A,8);
+	//cout << Height(root) << endl;
+	Delete(root, 25);
+	RDisplay(root);
+}
